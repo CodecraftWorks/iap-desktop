@@ -55,6 +55,8 @@ namespace Google.Solutions.Platform.Security
 
         /// <summary>
         /// Stores a password in the current user's login Keychain.
+        /// If an entry for the same service and account already exists,
+        /// it is updated in place.
         /// </summary>
         /// <param name="service">Service name (e.g. "iap-desktop").</param>
         /// <param name="account">Account/username.</param>
@@ -71,12 +73,41 @@ namespace Google.Solutions.Platform.Security
                 account,
                 (uint)passwordBytes.Length,
                 passwordBytes,
-                out _);
+                out IntPtr itemRef);
+
+            if (status == NativeMethods.ErrSecDuplicateItem)
+            {
+                //
+                // An entry already exists; update its password data.
+                //
+                if (itemRef == IntPtr.Zero)
+                {
+                    // Retrieve the existing item reference.
+                    status = NativeMethods.SecKeychainFindGenericPassword(
+                        IntPtr.Zero,
+                        (uint)service.Length,
+                        service,
+                        (uint)account.Length,
+                        account,
+                        out _,
+                        out _,
+                        out itemRef);
+                }
+
+                if (status == 0 && itemRef != IntPtr.Zero)
+                {
+                    status = NativeMethods.SecKeychainItemModifyAttributesAndData(
+                        itemRef,
+                        IntPtr.Zero,
+                        (uint)passwordBytes.Length,
+                        passwordBytes);
+                }
+            }
 
             if (status != 0)
             {
                 throw new InvalidOperationException(
-                    $"SecKeychainAddGenericPassword failed with status {status}.");
+                    $"Failed to store password in Keychain (status {status}).");
             }
         }
 
@@ -115,13 +146,17 @@ namespace Google.Solutions.Platform.Security
             }
             finally
             {
-                _ = NativeMethods.SecKeychainItemFreeContent(IntPtr.Zero, passwordData);
+                var freeStatus = NativeMethods.SecKeychainItemFreeContent(IntPtr.Zero, passwordData);
+                System.Diagnostics.Debug.Assert(
+                    freeStatus == 0,
+                    $"SecKeychainItemFreeContent failed with status {freeStatus}.");
             }
         }
 
         private static class NativeMethods
         {
             internal const int ErrSecItemNotFound = -25300;
+            internal const int ErrSecDuplicateItem = -25299;
 
             [DllImport("/System/Library/Frameworks/Security.framework/Security")]
             internal static extern int SecKeychainAddGenericPassword(
@@ -144,6 +179,13 @@ namespace Google.Solutions.Platform.Security
                 out uint passwordLength,
                 out IntPtr passwordData,
                 out IntPtr itemRef);
+
+            [DllImport("/System/Library/Frameworks/Security.framework/Security")]
+            internal static extern int SecKeychainItemModifyAttributesAndData(
+                IntPtr itemRef,
+                IntPtr attrList,
+                uint passwordLength,
+                byte[] password);
 
             [DllImport("/System/Library/Frameworks/Security.framework/Security")]
             internal static extern int SecKeychainItemFreeContent(

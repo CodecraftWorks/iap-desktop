@@ -100,10 +100,12 @@ jobs:
 
   #--------------------------------------------------------------------------
   # Build and test on macOS (Intel / x64)
+  # We cross-compile the x64 binary on the ARM64 runner, which avoids
+  # dependence on the deprecated macos-13 Intel runner.
   #--------------------------------------------------------------------------
   build-macos-x64:
     name: Build (macOS x64)
-    runs-on: macos-13   # Intel runner
+    runs-on: macos-latest   # ARM64 runner, cross-compiling for x64
 
     steps:
       - name: Checkout

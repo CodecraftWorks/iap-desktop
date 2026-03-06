@@ -155,7 +155,12 @@ namespace Google.Solutions.Apis.Client
 #else
                 var handler = new HttpClientHandler
                 {
-                    Proxy = WebRequest.DefaultWebProxy,
+                    //
+                    // On non-Windows platforms (e.g. macOS), use the platform's
+                    // default proxy from HttpClient rather than the legacy
+                    // WebRequest.DefaultWebProxy which is Windows-only.
+                    //
+                    Proxy = System.Net.Http.HttpClient.DefaultProxy,
                 };
 #endif
 
