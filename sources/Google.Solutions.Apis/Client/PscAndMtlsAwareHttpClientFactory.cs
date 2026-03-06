@@ -147,10 +147,22 @@ namespace Google.Solutions.Apis.Client
 
             protected override HttpClientHandler CreateClientHandler()
             {
+#if WINDOWS
                 var handler = new NtlmResilientWebRequestHandler(NtlmProxyAuthenticationRetries)
                 {
                     Proxy = WebRequest.DefaultWebProxy,
                 };
+#else
+                var handler = new HttpClientHandler
+                {
+                    //
+                    // On non-Windows platforms (e.g. macOS), use the platform's
+                    // default proxy from HttpClient rather than the legacy
+                    // WebRequest.DefaultWebProxy which is Windows-only.
+                    //
+                    Proxy = System.Net.Http.HttpClient.DefaultProxy,
+                };
+#endif
 
                 //
                 // Bypass proxy for accessing PSC endpoint.
@@ -183,6 +195,7 @@ namespace Google.Solutions.Apis.Client
             }
         }
 
+#if WINDOWS
         private class NtlmResilientWebRequestHandler : WebRequestHandler
         {
             private readonly ushort maxRetries;
@@ -265,5 +278,6 @@ namespace Google.Solutions.Apis.Client
                     proxyAuthHeader.StartsWith("NTLM ");
             }
         }
+#endif
     }
 }

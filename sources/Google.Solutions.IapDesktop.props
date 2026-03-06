@@ -1,6 +1,11 @@
 <Project>
   <PropertyGroup>
-    <DefaultTargetFramework>net47</DefaultTargetFramework>
+    <!--
+      Windows builds target .NET Framework 4.7. macOS builds
+      (set MACOS_BUILD=1) use .NET 8 instead.
+    -->
+    <DefaultTargetFramework Condition="'$(MACOS_BUILD)' != '1'">net47</DefaultTargetFramework>
+    <DefaultTargetFramework Condition="'$(MACOS_BUILD)' == '1'">net8.0</DefaultTargetFramework>
     <AssemblyTitle>$(ProjectName)</AssemblyTitle>
     <Company>Google LLC</Company>
     <Product>IAP Desktop</Product>
@@ -8,7 +13,12 @@
     <LangVersion>7.3</LangVersion>
     <Platforms>x64;x86</Platforms>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
+    <!--
+      Windows runtime identifiers only apply when targeting .NET Framework 4.7.
+      For net8.0 (macOS and cross-platform builds), individual projects declare
+      their own RuntimeIdentifiers (e.g. osx-x64;osx-arm64).
+    -->
+    <RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net47' AND '$(MACOS_BUILD)' != '1'">win7-x86;win7-x64</RuntimeIdentifiers>
 
     <!-- 
       Use C# 8 so that we can use nullable 
@@ -52,6 +62,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'">
     <DebugType>pdbonly</DebugType>
     <DefineConstants>ARM64;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+  <!--
+    Add the WINDOWS constant for all .NET Framework 4.7 compilations.
+    This guards Windows-only P/Invoke code (e.g. WebRequestHandler, CNG crypto)
+    from being compiled into cross-platform (net8.0 / macOS) builds.
+  -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net47'">
+    <DefineConstants>WINDOWS;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="!$(ProjectName.EndsWith('.Test'))">
