@@ -1,5 +1,4 @@
-﻿//
-// Copyright 2019 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -19,35 +18,22 @@
 // under the License.
 //
 
-using System;
-using System.Runtime.InteropServices;
+using Avalonia;
 
-namespace Google.Solutions.Apis.Diagnostics
+namespace Google.Solutions.IapDesktop.MacOs
 {
-    public interface IHelpTopic
+    internal sealed class Program
     {
-        string Title { get; }
-        Uri Address { get; }
-    }
+        // Avalonia configuration, do not remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .WithInterFont()
+                .LogToTrace();
 
-#if NET47
-    public interface IExceptionWithHelpTopic : _Exception
-#else
-    public interface IExceptionWithHelpTopic
-#endif
-    {
-        IHelpTopic? Help { get; }
-    }
-
-    public class HelpTopic : IHelpTopic
-    {
-        public string Title { get; }
-        public Uri Address { get; }
-
-        public HelpTopic(string title, string address)
-        {
-            this.Title = title;
-            this.Address = new Uri(address);
-        }
+        [System.STAThread]
+        public static int Main(string[] args)
+            => BuildAvaloniaApp()
+                .StartWithClassicDesktopLifetime(args);
     }
 }

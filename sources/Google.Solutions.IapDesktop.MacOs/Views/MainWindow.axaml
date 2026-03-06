@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="Google.Solutions.IapDesktop.MacOs.Views.MainWindow"
+        Title="IAP Desktop"
+        Width="1024"
+        Height="700"
+        MinWidth="800"
+        MinHeight="500">
+
+    <DockPanel>
+        <!-- Toolbar -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    Margin="8,8,8,4">
+            <Button Name="ConnectButton"
+                    Content="Connect"
+                    Click="OnConnectClicked" />
+            <Button Name="DisconnectButton"
+                    Content="Disconnect"
+                    IsEnabled="False"
+                    Click="OnDisconnectClicked" />
+        </StackPanel>
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Bottom"
+                BorderThickness="0,1,0,0"
+                Padding="8,4">
+            <TextBlock Name="StatusText"
+                       Text="Ready"
+                       FontSize="11" />
+        </Border>
+
+        <!-- Main content: project tree + session panel -->
+        <Grid ColumnDefinitions="240,Auto,*">
+            <!-- Left: project / VM tree -->
+            <Border Grid.Column="0"
+                    BorderThickness="0,0,1,0"
+                    Padding="4">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="Projects"
+                               FontWeight="SemiBold"
+                               Margin="4,4,4,8" />
+                    <TreeView Name="ProjectTree" />
+                </DockPanel>
+            </Border>
+
+            <!-- Resizer -->
+            <GridSplitter Grid.Column="1"
+                          Width="4"
+                          ResizeDirection="Columns" />
+
+            <!-- Right: session tabs -->
+            <TabControl Grid.Column="2"
+                        Name="SessionTabs"
+                        Margin="4">
+                <TabItem Header="Overview">
+                    <StackPanel Margin="16" Spacing="8">
+                        <TextBlock Text="IAP Desktop for macOS"
+                                   FontSize="22"
+                                   FontWeight="Bold" />
+                        <TextBlock TextWrapping="Wrap"
+                                   Text="Zero-trust Remote Desktop and SSH access to Google Cloud VMs via Identity-Aware Proxy." />
+                        <TextBlock TextWrapping="Wrap"
+                                   Foreground="Gray"
+                                   Text="Select a project and VM from the tree on the left, then click Connect to start a session." />
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
+</Window>

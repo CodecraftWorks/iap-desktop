@@ -1,0 +1,62 @@
+<!--
+  Copyright 2024 Google LLC
+
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyTitle>IAP Desktop</AssemblyTitle>
+    <AssemblyName>IapDesktop</AssemblyName>
+    <Company>Google LLC</Company>
+    <Product>IAP Desktop</Product>
+    <Copyright>Copyright 2024 Google LLC</Copyright>
+    <Description>Zero-trust Remote Desktop and SSH client for macOS</Description>
+    <LangVersion>8</LangVersion>
+    <Nullable>enable</Nullable>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
+    <RootNamespace>Google.Solutions.IapDesktop.MacOs</RootNamespace>
+
+    <!--
+      Generate a proper macOS .app bundle when publishing.
+      Use: dotnet publish -r osx-arm64 -self-contained
+    -->
+    <CFBundleIdentifier>com.google.iap-desktop</CFBundleIdentifier>
+    <CFBundleVersion>1.0.0</CFBundleVersion>
+    <CFBundleShortVersionString>1.0.0</CFBundleShortVersionString>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Google.Solutions.Apis\Google.Solutions.Apis.csproj" />
+    <ProjectReference Include="..\Google.Solutions.Iap\Google.Solutions.Iap.csproj" />
+    <ProjectReference Include="..\Google.Solutions.Platform.MacOs\Google.Solutions.Platform.MacOs.csproj" />
+  </ItemGroup>
+</Project>

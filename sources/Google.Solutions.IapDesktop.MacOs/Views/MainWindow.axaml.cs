@@ -1,5 +1,4 @@
-﻿//
-// Copyright 2019 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -19,35 +18,33 @@
 // under the License.
 //
 
-using System;
-using System.Runtime.InteropServices;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
 
-namespace Google.Solutions.Apis.Diagnostics
+namespace Google.Solutions.IapDesktop.MacOs.Views
 {
-    public interface IHelpTopic
+    /// <summary>
+    /// Main application window for IAP Desktop on macOS.
+    /// </summary>
+    public partial class MainWindow : Window
     {
-        string Title { get; }
-        Uri Address { get; }
-    }
-
-#if NET47
-    public interface IExceptionWithHelpTopic : _Exception
-#else
-    public interface IExceptionWithHelpTopic
-#endif
-    {
-        IHelpTopic? Help { get; }
-    }
-
-    public class HelpTopic : IHelpTopic
-    {
-        public string Title { get; }
-        public Uri Address { get; }
-
-        public HelpTopic(string title, string address)
+        public MainWindow()
         {
-            this.Title = title;
-            this.Address = new Uri(address);
+            InitializeComponent();
+        }
+
+        private void OnConnectClicked(object? sender, RoutedEventArgs e)
+        {
+            StatusText.Text = "Connecting...";
+            ConnectButton.IsEnabled = false;
+            DisconnectButton.IsEnabled = true;
+        }
+
+        private void OnDisconnectClicked(object? sender, RoutedEventArgs e)
+        {
+            StatusText.Text = "Disconnected";
+            ConnectButton.IsEnabled = true;
+            DisconnectButton.IsEnabled = false;
         }
     }
 }

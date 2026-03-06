@@ -1,5 +1,4 @@
-﻿//
-// Copyright 2019 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -19,35 +18,28 @@
 // under the License.
 //
 
-using System;
-using System.Runtime.InteropServices;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Google.Solutions.IapDesktop.MacOs.Views;
 
-namespace Google.Solutions.Apis.Diagnostics
+namespace Google.Solutions.IapDesktop.MacOs
 {
-    public interface IHelpTopic
+    public class App : Application
     {
-        string Title { get; }
-        Uri Address { get; }
-    }
-
-#if NET47
-    public interface IExceptionWithHelpTopic : _Exception
-#else
-    public interface IExceptionWithHelpTopic
-#endif
-    {
-        IHelpTopic? Help { get; }
-    }
-
-    public class HelpTopic : IHelpTopic
-    {
-        public string Title { get; }
-        public Uri Address { get; }
-
-        public HelpTopic(string title, string address)
+        public override void Initialize()
         {
-            this.Title = title;
-            this.Address = new Uri(address);
+            AvaloniaXamlLoader.Load(this);
+        }
+
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.MainWindow = new MainWindow();
+            }
+
+            base.OnFrameworkInitializationCompleted();
         }
     }
 }

@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\Google.Solutions.IapDesktop.props" />
   <PropertyGroup>
-    <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+    <!--
+      Target net47 for the existing Windows application and net8.0
+      for the new macOS application and cross-platform tooling.
+    -->
+    <TargetFrameworks>net47;net8.0</TargetFrameworks>
     <AssemblyTitle>$(ProjectName)</AssemblyTitle>
     <Description>API extensions library</Description>
     <Platforms>x64;x86;ARM64</Platforms>
@@ -16,7 +20,7 @@
     <PackageReference Include="Google.Apis.Logging.v2" />
     <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net47'">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />

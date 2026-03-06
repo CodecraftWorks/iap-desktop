@@ -35,6 +35,12 @@
         <PackageVersion Include="Google.Solutions.Tsc" Version="9.0.0.1" />
         <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
       
+        <!-- Avalonia UI (cross-platform, used by macOS app) -->
+        <PackageVersion Include="Avalonia" Version="11.3.12" />
+        <PackageVersion Include="Avalonia.Desktop" Version="11.3.12" />
+        <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.12" />
+        <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.12" />
+
         <!-- Unit testing -->
         <PackageVersion Include="Castle.Core" Version="5.2.1" />
         <PackageVersion Include="Moq" Version="4.20.72" />

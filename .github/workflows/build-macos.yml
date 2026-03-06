@@ -1,0 +1,145 @@
+#
+# Copyright 2024 Google LLC
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: Build and test macOS application
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "sources/Google.Solutions.IapDesktop.MacOs/**"
+      - "sources/Google.Solutions.Platform.MacOs/**"
+      - "sources/Google.Solutions.Common/**"
+      - "sources/Google.Solutions.Apis/**"
+      - "sources/Google.Solutions.Iap/**"
+      - "sources/Directory.Packages.props"
+      - "sources/Google.Solutions.IapDesktop.props"
+      - ".github/workflows/build-macos.yml"
+
+  pull_request:
+    branches: ["master"]
+    paths:
+      - "sources/Google.Solutions.IapDesktop.MacOs/**"
+      - "sources/Google.Solutions.Platform.MacOs/**"
+      - "sources/Google.Solutions.Common/**"
+      - "sources/Google.Solutions.Apis/**"
+      - "sources/Google.Solutions.Iap/**"
+      - "sources/Directory.Packages.props"
+      - "sources/Google.Solutions.IapDesktop.props"
+      - ".github/workflows/build-macos.yml"
+
+  #
+  # Allows running this workflow manually from the Actions tab.
+  #
+  workflow_dispatch:
+
+jobs:
+  #--------------------------------------------------------------------------
+  # Build and test on macOS (Apple Silicon / ARM64)
+  #--------------------------------------------------------------------------
+  build-macos-arm64:
+    name: Build (macOS ARM64)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        working-directory: sources
+        run: |
+          dotnet restore Mac.sln
+
+      - name: Build (ARM64)
+        working-directory: sources
+        run: |
+          dotnet build Mac.sln \
+            --configuration Release \
+            --framework net8.0 \
+            --no-restore
+
+      - name: Publish self-contained app (ARM64)
+        working-directory: sources
+        run: |
+          dotnet publish \
+            Google.Solutions.IapDesktop.MacOs/Google.Solutions.IapDesktop.MacOs.csproj \
+            --configuration Release \
+            --framework net8.0 \
+            --runtime osx-arm64 \
+            --self-contained true \
+            --output artifacts/osx-arm64
+
+      - name: Upload artifact (ARM64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: iap-desktop-macos-arm64
+          path: sources/artifacts/osx-arm64/
+
+  #--------------------------------------------------------------------------
+  # Build and test on macOS (Intel / x64)
+  #--------------------------------------------------------------------------
+  build-macos-x64:
+    name: Build (macOS x64)
+    runs-on: macos-13   # Intel runner
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        working-directory: sources
+        run: |
+          dotnet restore Mac.sln
+
+      - name: Build (x64)
+        working-directory: sources
+        run: |
+          dotnet build Mac.sln \
+            --configuration Release \
+            --framework net8.0 \
+            --no-restore
+
+      - name: Publish self-contained app (x64)
+        working-directory: sources
+        run: |
+          dotnet publish \
+            Google.Solutions.IapDesktop.MacOs/Google.Solutions.IapDesktop.MacOs.csproj \
+            --configuration Release \
+            --framework net8.0 \
+            --runtime osx-x64 \
+            --self-contained true \
+            --output artifacts/osx-x64
+
+      - name: Upload artifact (x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: iap-desktop-macos-x64
+          path: sources/artifacts/osx-x64/
